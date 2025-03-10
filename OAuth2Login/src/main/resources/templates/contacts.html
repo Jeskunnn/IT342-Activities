@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Your Google Contacts</h1>
+
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <table class="w-full table-auto">
+                <thead class="bg-blue-500 text-white">
+                    <tr>
+                        <th class="px-6 py-3">Name</th>
+                        <th class="px-6 py-3">Email</th>
+                        <th class="px-6 py-3">Phone</th>
+                        <th class="px-6 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="contact : ${contacts}" class="border-b hover:bg-gray-100">
+                        <td class="px-6 py-4" th:if="${contact.names}" th:text="${contact.names[0].displayName}"></td>
+                        <td class="px-6 py-4" th:if="${contact.emailAddresses}" th:text="${contact.emailAddresses[0].value}"></td>
+                        <td class="px-6 py-4" th:if="${contact.phoneNumbers}" th:text="${contact.phoneNumbers[0].value}"></td>
+                        <td class="px-6 py-4 space-x-2">
+                            <form action="/contacts/delete" method="post" class="inline-block">
+                                <input type="hidden" name="resourceName" th:value="${contact.resourceName}" />
+                                <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Delete</button>
+                            </form>
+                            <form action="/contacts/update" method="post" class="inline-block">
+                                <input type="hidden" name="resourceName" th:value="${contact.resourceName}" />
+                                <button type="button" onclick="openModal(this)" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Contact Section -->
+        <div class="mt-8 bg-white p-6 shadow-lg rounded-lg">
+            <h2 class="text-xl font-semibold text-center mb-4 text-blue-600">Add New Contact</h2>
+            <form action="/add" method="post" class="space-y-4">
+                <input type="text" name="name" placeholder="Full Name" required class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300">
+                <input type="email" name="email" placeholder="Email Address" class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300">
+                <input type="text" name="phone" placeholder="Phone Number" class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300">
+                <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Add Contact</button>
+            </form>
+        </div>
+
+        <!-- Update Contact Modal -->
+        <div id="updateModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex justify-center items-center">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h2 class="text-xl font-semibold mb-4 text-blue-600">Update Contact</h2>
+                <form action="/contacts/update" method="post" class="space-y-4">
+                    <input type="hidden" name="resourceName" id="updateResourceName">
+                    <input type="text" name="name" placeholder="New Name" required class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300">
+                    <input type="email" name="email" placeholder="New Email" class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300">
+                    <input type="text" name="phone" placeholder="New Phone" class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300">
+                    <div class="flex justify-between">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(button) {
+            document.getElementById("updateModal").classList.remove("hidden");
+            let resourceName = button.parentElement.querySelector("input[name='resourceName']").value;
+            document.getElementById("updateResourceName").value = resourceName;
+        }
+
+        function closeModal() {
+            document.getElementById("updateModal").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
